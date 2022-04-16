@@ -1,6 +1,7 @@
 package com.example.practice
 
 import android.content.Intent
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,8 @@ class MainActivity : AppCompatActivity() {
 
     private var song: Song = Song()
     private var gson: Gson = Gson()
+
+    private var mediaPlayer: MediaPlayer?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,15 +47,32 @@ class MainActivity : AppCompatActivity() {
 
         // 챌린지 과제
         binding.mainMiniplayerBtn.setOnClickListener {
-            binding.mainPauseBtn.visibility=View.VISIBLE
-            binding.mainMiniplayerBtn.visibility=View.GONE
+            setMiniPlayerStatus(true)
         }
         binding.mainPauseBtn.setOnClickListener {
-            binding.mainMiniplayerBtn.visibility=View.VISIBLE
-            binding.mainPauseBtn.visibility=View.GONE
+            setMiniPlayerStatus(false)
         }
         // 여기까지
     }
+
+    // 챌린지 과제
+    // 재생까지는 완료
+    private fun setMiniPlayerStatus(isPlaying:Boolean){ // song.isPlaying
+        song.isPlaying=isPlaying
+        if(isPlaying){
+            binding.mainPauseBtn.visibility=View.VISIBLE
+            binding.mainMiniplayerBtn.visibility=View.GONE
+            mediaPlayer?.start()
+        }
+        else{
+            binding.mainMiniplayerBtn.visibility=View.VISIBLE
+            binding.mainPauseBtn.visibility=View.GONE
+            if(mediaPlayer?.isPlaying==true){
+                mediaPlayer?.pause()
+            }
+        }
+    }
+    // 여기까지
 
     private fun initBottomNavigation(){
 
@@ -97,6 +117,11 @@ class MainActivity : AppCompatActivity() {
         binding.mainMiniplayerTitleTv.text=song.title
         binding.mainMiniplayerSingerTv.text=song.singer
         binding.mainMiniplayerProgressSb.progress=(song.second * 100000)/song.playTime
+
+        // 챌린지 과제
+        val music=resources.getIdentifier(song.music,"raw",this.packageName)
+        mediaPlayer=MediaPlayer.create(this,music) // mediaPlayer에 이 음악 재생할 것임을 알려줌
+        // 여기까지
     }
 
     // onCreate가 아닌 onStart 함수에 작성하는 이유는 액티비티 전환이 될 때 onStart 부터 시작하기 때문
@@ -116,4 +141,12 @@ class MainActivity : AppCompatActivity() {
 
         setMiniPlayer(song)
     }
+
+    // 챌린지 과제
+    override fun onPause() {
+        super.onPause()
+        setMiniPlayerStatus(false) // 음악 재생 종료
+        Log.d("onPause","miniPlayer 실행 도중 앱이 포커스를 잃음") // Log 출력
+    }
+    // 여기까지
 }
