@@ -6,10 +6,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import com.example.practice.databinding.ActivityMainBinding
+import com.google.gson.Gson
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
+
+    private var song: Song = Song()
+    private var gson: Gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +24,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val song = Song(binding.mainMiniplayerTitleTv.text.toString(),binding.mainMiniplayerSingerTv.text.toString(),0,60,false,"elec")
+        // sharedPreference에 저장된 값을 들고올 것이기 때문에 이 값은 이제 필요가 없음
+        // val song = Song(binding.mainMiniplayerTitleTv.text.toString(),binding.mainMiniplayerSingerTv.text.toString(),0,60,false,"elec")
 
         binding.mainPlayerCl.setOnClickListener {
             //startActivity(Intent(this, SongActivity::class.java))
@@ -88,4 +93,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setMiniPlayer(song:Song){
+        binding.mainMiniplayerTitleTv.text=song.title
+        binding.mainMiniplayerSingerTv.text=song.singer
+        binding.mainMiniplayerProgressSb.progress=(song.second * 100000)/song.playTime
+    }
+
+    // onCreate가 아닌 onStart 함수에 작성하는 이유는 액티비티 전환이 될 때 onStart 부터 시작하기 때문
+    // onStart -> 사용자에게 액티비티가 보여지기 전에 실행되는 함수
+    // onResume -> 화면이 보여지고 난 후 호출되는 함수기 때문에 onStart에서 ui와 관련된 코드를 초기화하는 것이 더 안정적임
+    override fun onStart(){
+        super.onStart()
+        val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE)
+        val songJson = sharedPreferences.getString("songData",null)
+
+        song = if(songJson==null){
+            // 노래 제목을 내가 elec으로 해놔서 elec으로 써주기 -> 원래는 music_lilac임
+            Song("라일락","아이유(IU)",0,60,false,"elec")
+        } else{
+            gson.fromJson(songJson,Song::class.java) // songJson을 java 객체인 Song 객체로 변환해달라는 의미
+        }
+
+        setMiniPlayer(song)
+    }
 }
