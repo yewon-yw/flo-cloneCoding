@@ -149,4 +149,11 @@ class MainActivity : AppCompatActivity() {
         Log.d("onPause","miniPlayer 실행 도중 앱이 포커스를 잃음") // Log 출력
     }
     // 여기까지
+
+    // 챌린지 과제
+    fun playOnMiniPlayer(album:Album){
+        binding.mainMiniplayerTitleTv.text=album.title.toString()
+        binding.mainMiniplayerSingerTv.text=album.singer.toString()
+    }
+    // 여기까지
 }

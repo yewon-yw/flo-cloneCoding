@@ -10,14 +10,23 @@ class AlbumRVAdapter(private var albumList:ArrayList<Album>): RecyclerView.Adapt
     // 외부에서 클릭 이벤트를 사용하기 위해서 외부에서 리스너 객체를 넘겨줘야함
     // 외부에서 리스너 객체를 전달받는 함수와 전달받은 리스너 객체를 어댑터에서 사용할 수 있도록 따로 저장할 변수가 필요
     interface MyItemClickListener{ // 인터페이스
-        fun onItemClick(){
-//            Log.d("test","인터페이스")
-        }
+        fun onItemClick(album:Album){ }// 앨범 데이터를 받아오기 위해 인자값으로 받음
+        //        fun onRemoveAlbum(position: Int)
+        fun playOnMiniPlayer(album: Album) { } // 챌린지 과제
     }
     private lateinit var mItemClickListener: MyItemClickListener // 전달받은 리스너 객체를 어댑터에서 사용할 수 있도록 따로 저장할 변수
     fun setMyItemClickListener(itemClickListener: MyItemClickListener){ // 외부에서 리스너 객체를 전달받는 함수 -> 어댑터 외부에있는 homeFragment에서 리스너 객체를 던져줌
         mItemClickListener = itemClickListener
     }
+
+//    fun addItem(album:Album){
+//        albumList.add(album)
+//        notifyDataSetChanged() // RecyclerView는 데이터가 변경된 것을 모르기 때문에 데이터 변경됐음을 알려줘야함
+//    }
+//    fun removeItem(position: Int){
+//        albumList.removeAt(position)
+//        notifyDataSetChanged()
+//    }
 
     // 아이템 뷰 객체들에게 데이터를 바인딩 해주기 위해 만든 데이터 리스트를 매개변수로 받아옴
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): AlbumRVAdapter.ViewHolder {
@@ -37,7 +46,13 @@ class AlbumRVAdapter(private var albumList:ArrayList<Album>): RecyclerView.Adapt
         holder.bind(albumList[position]) // ViewHolder 클래스의 bind 함수 호출 -> 함수에서 받아온 데이터를 아이템 뷰 객체에 넣어주는 동작 실행
 
         // 뷰 홀더의 아이템 뷰가 클릭됐을 때 클릭 리스너의 역할을 하는 인터페이스의 함수인 onItemClick 함수 호출
-        holder.itemView.setOnClickListener { mItemClickListener.onItemClick() }
+        holder.itemView.setOnClickListener { mItemClickListener.onItemClick(albumList[position]) }
+
+        // 챌린지 과제
+        holder.binding.itemAlbumPlayImgIv.setOnClickListener { mItemClickListener.playOnMiniPlayer(albumList[position]) }
+
+        // 타이틀이 클릭됐을 때 해당 아이템 뷰를 삭제
+//        holder.binding.itemAlbumTitleTv.setOnClickListener { mItemClickListener.onRemoveAlbum(position) }
     }
 
     // 데이터 셋 크기를 알려주는 함수 = 받아온 데이터리스트의 크기
