@@ -4,13 +4,16 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.practice.databinding.ActivitySongBinding
 import com.google.gson.Gson
 
 class SongActivity : AppCompatActivity() {
     lateinit var binding: ActivitySongBinding
-    lateinit var song : Song // song 객체
+
+    // 현재 노래는 songs[nowPos]로 접근할 것이기 때문에 song 변수는 삭제하고 모든 song은 songs[nowPos]로 변경
+//    lateinit var song : Song // song 객체
     lateinit var timer : Timer // Timer 객체
 
     // activity가 소멸될 때 mediaPlayer를 해제시켜줘야 하기 때문에 nullable(mediaPlayer?)로 설정
@@ -19,86 +22,142 @@ class SongActivity : AppCompatActivity() {
     // gson 선언
     private var gson: Gson = Gson()
 
+    // song 데이터를 리스트를 사용해서 관리하기 위해 리스트 선언
+    val songs = arrayListOf<Song>()
+    // DB도 전역변수로 선언
+    lateinit var songDB: SongDatabase
+    // 리스트의 인덱스로 데이터를 관리할 예정이라 인덱스용 변수 선언
+    var nowPos = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySongBinding.inflate(layoutInflater) // 바인딩 초기화
         /* inflater는 xml에 표기된 레이아웃들을 메모리에 객체화 시키는 행동으로 이해 */
         setContentView(binding.root) // ctrl + 'root'click 하면 activity_song.xml로 이동
 
+        initPlayList()
         initSong()
-        setPlayer(song)
+        //setPlayer(song)
+        initClickListener()
 
-        if(intent.hasExtra("title")&&intent.hasExtra("singer")){ // intent에 title과 singer의 값이 있는지 확인
-            binding.songMusicTitleTv.text=intent.getStringExtra("title")
-            binding.songSingerNameTv.text=intent.getStringExtra("singer")
+//        if(intent.hasExtra("title")&&intent.hasExtra("singer")){ // intent에 title과 singer의 값이 있는지 확인
+//            binding.songMusicTitleTv.text=intent.getStringExtra("title")
+//            binding.songSingerNameTv.text=intent.getStringExtra("singer")
+//        }
+
+    }
+    /* onCreate는 AppCompatActivity라는 클래스 안에 있는 함수를 오버라이딩 */
+
+
+    private fun initPlayList(){
+        // songDB에 있는 데이터를 전부 songs 리스트에 넣어줌
+        songDB = SongDatabase.getInstance(this)!!
+        songs.addAll(songDB.songDao().getSongs())
+    }
+
+    // DB 사용 전
+//    // song 객체 초기화
+//    private fun initSong(){
+//        if(intent.hasExtra("title")&&intent.hasExtra("singer")){
+//            song = Song(
+//                intent.getStringExtra("title")!!, // not null
+//                intent.getStringExtra("singer")!!, // not null
+//                intent.getIntExtra("second",0),
+//                intent.getIntExtra("playTime",0),
+//                intent.getBooleanExtra("isPlaying",false),
+//                intent.getStringExtra("music")!!
+//            )
+//        }
+//        startTimer()
+//    }
+    // DB 사용
+    private fun initSong(){
+        val spf = getSharedPreferences("song", MODE_PRIVATE)
+        val songId = spf.getInt("songId",0)
+        nowPos = getPlayingSongPosition(songId)
+
+        Log.d("now Song ID",songs[nowPos].id.toString())
+
+        startTimer()
+        setPlayer(songs[nowPos])
+    }
+    // 반복문을 돌려 songs 리스트 내에 있는 데이터들 중에 매개변수로 받은 id값과 같은 id값을 가진 객체의 인덱스를 리턴
+    private fun getPlayingSongPosition(songId:Int): Int {
+        for(i in 0 until songs.size){
+            if(songId == songs[i].id){
+                return i
+            }
         }
+        return 0
+    }
 
+    private fun initClickListener() {
         binding.songDownIb.setOnClickListener {
             finish()
         }
-
         binding.songMiniplayerIv.setOnClickListener {
             setPlayerStatus(true)
         }
         binding.songPauseIv.setOnClickListener{
             setPlayerStatus(false)
         }
-
-        // 챌린지 과제 반복 재생 이미지 변경 *******************************************
-        var repeat:Boolean=false
-        binding.songRepeatIv.setOnClickListener {
-            if(!repeat){
-                binding.songRepeatIv.setImageResource(R.drawable.nugu_btn_random_inactive)// 이미지가 없어서 일단 이걸로
-            }
-            else{
-                binding.songRepeatIv.setImageResource(R.drawable.nugu_btn_repeat_inactive)
-            }
-            repeat=!repeat
+        binding.songPreviousIv.setOnClickListener {
+            moveSong(-1)
         }
-        var random:Boolean=false
-        binding.songRandomIv.setOnClickListener {
-            if(!random){
-                binding.songRandomIv.setImageResource(R.drawable.nugu_btn_repeat_inactive)
-            }
-            else{
-                binding.songRandomIv.setImageResource(R.drawable.nugu_btn_random_inactive)
-            }
-            random=!random
+        binding.songNextIv.setOnClickListener {
+            moveSong(1)
         }
-        var like:Boolean=false
         binding.songLikeIv.setOnClickListener {
-            if(!like){
-                binding.songLikeIv.setImageResource(R.drawable.ic_my_like_on)
-                like
-            }
-            else{
-                binding.songLikeIv.setImageResource(R.drawable.ic_my_like_off)
-            }
-            like=!like
+            setLike(songs[nowPos].isLike)
         }
-        // 여기까지 *****************************************************************
     }
-    /* onCreate는 AppCompatActivity라는 클래스 안에 있는 함수를 오버라이딩 */
 
-    // song 객체 초기화
-    private fun initSong(){
-        if(intent.hasExtra("title")&&intent.hasExtra("singer")){
-            song = Song(
-                intent.getStringExtra("title")!!, // not null
-                intent.getStringExtra("singer")!!, // not null
-                intent.getIntExtra("second",0),
-                intent.getIntExtra("playTime",0),
-                intent.getBooleanExtra("isPlaying",false),
-                intent.getStringExtra("music")!!
-            )
+    private fun moveSong(direct: Int){
+        if(nowPos + direct < 0){
+            Toast.makeText(this,"first song",Toast.LENGTH_SHORT).show()
+            return
         }
+        if(nowPos + direct >= songs.size){
+            Toast.makeText(this,"last song",Toast.LENGTH_SHORT).show()
+            return
+        }
+        nowPos += direct
+
+        // timer 스레드 멈춤
+        timer.interrupt()
+        // 변경된 nowPos에 대하여 스레드 재실행
         startTimer()
+
+        // mediaPlayer도 새로운 노래를 틀어야 하기 때문에 해제시켜줌
+        mediaPlayer?.release()
+        mediaPlayer = null
+
+        // mediaPlayer는 setPlayer 함수 내에서 재시작 해주기 때문에 mediaPlayer를 따로 재시작할 필요는 없음
+        setPlayer(songs[nowPos])
+
+        return
+    }
+
+    private fun setLike(isLike: Boolean){
+        songs[nowPos].isLike = !isLike // DB 값을 업데이트 한 것이 아님
+        songDB.songDao().updateIsLikeById(!isLike,songs[nowPos].id)
+
+        // 새롭게 렌더링(화면)
+        if(!isLike){
+            binding.songLikeIv.setImageResource(R.drawable.ic_my_like_on)
+        } else{
+            binding.songLikeIv.setImageResource(R.drawable.ic_my_like_off)
+        }
     }
 
     // UI변경
     private fun setPlayer(song:Song) {
-        binding.songMusicTitleTv.text = intent.getStringExtra("title")!!
-        binding.songSingerNameTv.text = intent.getStringExtra("singer")!!
+        // 인텐트로 화면전환만 할 뿐 데이터를 전송하지 않으니 인텐트 대신 song으로 바꿔줌
+//        binding.songMusicTitleTv.text = intent.getStringExtra("title")!!
+        binding.songMusicTitleTv.text = song.title
+//        binding.songSingerNameTv.text = intent.getStringExtra("singer")!!
+        binding.songSingerNameTv.text = song.singer
+
         binding.songStartTimeTv.text =
             String.format("%02d:%02d", song.second / 60, song.second % 60)
         binding.songEndTimeTv.text =
@@ -108,6 +167,15 @@ class SongActivity : AppCompatActivity() {
         val music=resources.getIdentifier(song.music,"raw",this.packageName)
         mediaPlayer=MediaPlayer.create(this,music) // mediaPlayer에 이 음악 재생할 것임을 알려줌
 
+        binding.songAlbumIv.setImageResource(song.coverImg!!)
+
+        // 좋아요 버튼
+        if(song.isLike){
+            binding.songLikeIv.setImageResource(R.drawable.ic_my_like_on)
+        } else{
+            binding.songLikeIv.setImageResource(R.drawable.ic_my_like_off)
+        }
+
         setPlayerStatus(song.isPlaying)
     }
 
@@ -116,7 +184,7 @@ class SongActivity : AppCompatActivity() {
         // song의 isPlaying 값과 timer의 isPlaying값을 setPlayerStatus의 isPlaying값으로 변경해줌
         // 노래 재생버튼이 눌렸을때 song,timer의 isPlaying값은 true
         // 노래 퍼즈버튼이 눌렸을때 song,timer의 isPlaying값은 false
-        song.isPlaying=isPlaying
+        songs[nowPos].isPlaying=isPlaying
         timer.isPlaying=isPlaying
 
         if (isPlaying) {
@@ -135,7 +203,7 @@ class SongActivity : AppCompatActivity() {
     }
 
     private fun startTimer(){
-        timer=Timer(song.playTime,song.isPlaying) // Timer 클래스의 객체 초기화
+        timer=Timer(songs[nowPos].playTime,songs[nowPos].isPlaying) // Timer 클래스의 객체 초기화
         timer.start() // thread 시작
     }
 
@@ -203,13 +271,19 @@ class SongActivity : AppCompatActivity() {
         super.onPause()
         setPlayerStatus(false)
         // 1000으로 나눠주는 이유는 현재 계산된 값이 ms 단위인데 song 데이터 객체는 s 단위이기 때문에 나눠줌
-        song.second=((binding.songProgressSb.progress*song.playTime)/100)/1000
+        songs[nowPos].second=((binding.songProgressSb.progress*songs[nowPos].playTime)/100)/1000
+
         // 내부 저장소에 데이터를 저장할 수 있게 도와줌 -> 어플이 종료되어도 남아있으려면 어딘가에 저장해줘야 하기 때문
         val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE)
         val editor=sharedPreferences.edit() // 에디터
+
         // editor.putString("title",song.title) // (key,value) // 비효율적 -> Json 사용
-        val songJson = gson.toJson(song) // gson이 song 객체를 json 포맷으로 바꿔줌
-        editor.putString("songData",songJson)
+//        val songJson = gson.toJson(songs[nowPos]) // gson이 song 객체를 json 포맷으로 바꿔줌
+
+        // DB사용 후 song 객체 자체를 저장하는 것이 아니라 song id값을 저장해주면 됨
+//        editor.putString("songData",songJson)
+        editor.putInt("songId",songs[nowPos].id)
+
         editor.apply() // apply까지 해줘야 실제로 저장 작업이 완료됨
     }
 
