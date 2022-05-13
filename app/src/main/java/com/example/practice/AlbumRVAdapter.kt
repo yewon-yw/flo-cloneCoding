@@ -19,14 +19,14 @@ class AlbumRVAdapter(private var albumList:ArrayList<Album>): RecyclerView.Adapt
         mItemClickListener = itemClickListener
     }
 
-//    fun addItem(album:Album){
-//        albumList.add(album)
-//        notifyDataSetChanged() // RecyclerView는 데이터가 변경된 것을 모르기 때문에 데이터 변경됐음을 알려줘야함
-//    }
-//    fun removeItem(position: Int){
-//        albumList.removeAt(position)
-//        notifyDataSetChanged()
-//    }
+    fun addItem(album:Album){
+        albumList.add(album)
+        notifyDataSetChanged() // RecyclerView는 데이터가 변경된 것을 모르기 때문에 데이터 변경됐음을 알려줘야함
+    }
+    fun removeItem(position: Int){
+        albumList.removeAt(position)
+        notifyDataSetChanged()
+    }
 
     // 아이템 뷰 객체들에게 데이터를 바인딩 해주기 위해 만든 데이터 리스트를 매개변수로 받아옴
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): AlbumRVAdapter.ViewHolder {

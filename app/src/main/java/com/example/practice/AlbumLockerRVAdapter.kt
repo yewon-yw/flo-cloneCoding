@@ -1,56 +1,59 @@
 package com.example.practice
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.practice.databinding.ItemSongBinding
+import com.example.practice.databinding.ItemLockerAlbumBinding
 
-// 과제용
-class AlbumLockerRVAdapter(private var songList:ArrayList<Album>):RecyclerView.Adapter<AlbumLockerRVAdapter.ViewHolder>() {
+class AlbumLockerRVAdapter (): RecyclerView.Adapter<AlbumLockerRVAdapter.ViewHolder>() {
+    private val albums = ArrayList<Album>()
 
     interface MyItemClickListener{
-        fun onItemClick(album: Album){ }
-        fun onRemoveAlbum(position: Int) { }
-        fun onAddAlbum(album: Album){ }
-    }
-    private lateinit var mItemClickListener: AlbumLockerRVAdapter.MyItemClickListener
-    fun setMyItemClickListener(itemClickListener: AlbumLockerRVAdapter.MyItemClickListener){
-        mItemClickListener=itemClickListener
+        fun onRemoveSong(songId: Int)
     }
 
-    fun addItem(album:Album){
-        songList.add(Album(album.title.toString(),album.singer.toString(),album.coverImg))
-        notifyDataSetChanged()
+    private lateinit var mItemClickListener: MyItemClickListener
+
+    fun setMyItemClickListener(itemClickListener: MyItemClickListener){
+        mItemClickListener = itemClickListener
     }
 
-    fun removeItem(position: Int){
-        songList.removeAt(position)
-        notifyDataSetChanged()
-    }
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): AlbumLockerRVAdapter.ViewHolder {
+        val binding: ItemLockerAlbumBinding = ItemLockerAlbumBinding.inflate(LayoutInflater.from(viewGroup.context), viewGroup, false)
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
-        val binding:ItemSongBinding= ItemSongBinding.inflate(LayoutInflater.from(viewGroup.context),viewGroup,false)
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(songList[position])
-        holder.itemView.setOnClickListener { mItemClickListener.onItemClick(songList[position]) }
-        holder.binding.itemSongMoreIv.setOnClickListener {
-            mItemClickListener.onRemoveAlbum(position)
-        }
-        holder.binding.itemSongPlayerIv.setOnClickListener {
-            mItemClickListener.onAddAlbum(songList[position])
+    override fun onBindViewHolder(holder: AlbumLockerRVAdapter.ViewHolder, position: Int) {
+        holder.bind(albums[position])
+        holder.binding.itemAlbumMoreIv.setOnClickListener {
+            mItemClickListener.onRemoveSong(albums[position].id)
+            removeSong(position)
         }
     }
 
-    override fun getItemCount(): Int = songList.size
+    override fun getItemCount(): Int = albums.size
 
-    inner class ViewHolder(val binding:ItemSongBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(album:Album){
-            binding.itemSongImgIv.setImageResource(album.coverImg!!)
-            binding.itemSongTitleTv.text=album.title.toString()
-            binding.itemSongSingerTv.text=album.singer.toString()
+    @SuppressLint("NotifyDataSetChanged")
+    fun addAlbums(albums: ArrayList<Album>) {
+        this.albums.clear()
+        this.albums.addAll(albums)
+
+        notifyDataSetChanged()
+    }
+
+    fun removeSong(position: Int){
+        albums.removeAt(position)
+        notifyDataSetChanged()
+    }
+
+    inner class ViewHolder(val binding: ItemLockerAlbumBinding) : RecyclerView.ViewHolder(binding.root){
+        fun bind(album: Album){
+            binding.itemAlbumImgIv.setImageResource(album.coverImg!!)
+            binding.itemAlbumTitleTv.text = album.title
+            binding.itemAlbumSingerTv.text = album.singer
         }
     }
+
 }
