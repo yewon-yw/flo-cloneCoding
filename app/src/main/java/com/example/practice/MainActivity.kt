@@ -37,6 +37,13 @@ class MainActivity : AppCompatActivity() {
         initClickListener()
 
         initBottomNavigation()
+
+        Log.d("MAIN/JWT_TO_SERVER",getJwt().toString()) // 로그인 API를 통해 받아온 Jwt 로그 출력
+    }
+
+    private fun getJwt(): String? {
+        val spf = this.getSharedPreferences("auth",AppCompatActivity.MODE_PRIVATE)
+        return spf!!.getString("jwt","")
     }
 
     private fun initClickListener(){
