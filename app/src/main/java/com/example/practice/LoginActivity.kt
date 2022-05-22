@@ -2,10 +2,13 @@ package com.example.practice
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.practice.data.entities.User
+import com.example.practice.data.remote.AuthService
+import com.example.practice.data.remote.Result
 import com.example.practice.databinding.ActivityLoginBinding
+import com.example.practice.ui.main.MainActivity
 
 class LoginActivity:AppCompatActivity(),LoginView {
     lateinit var binding: ActivityLoginBinding
@@ -45,7 +48,7 @@ class LoginActivity:AppCompatActivity(),LoginView {
 //            startMainActivity() // 메인 액티비티로 전환
 //            return
 //        }
-        val authService=AuthService()
+        val authService= AuthService()
         authService.setLoginView(this)
 
         authService.login(User(email,pwd,""))
@@ -70,7 +73,7 @@ class LoginActivity:AppCompatActivity(),LoginView {
     }
 
     private fun startMainActivity(){
-        val intent= Intent(this,MainActivity::class.java)
+        val intent= Intent(this, MainActivity::class.java)
         startActivity(intent)
 
     }

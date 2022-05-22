@@ -1,14 +1,13 @@
 package com.example.practice
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.practice.data.entities.User
+import com.example.practice.data.remote.AuthResponse
+import com.example.practice.data.remote.AuthService
 import com.example.practice.databinding.ActivitySignupBinding
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SignUpActivity:AppCompatActivity(),SignUpView {
     lateinit var binding:ActivitySignupBinding

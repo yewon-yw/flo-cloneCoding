@@ -1,15 +1,15 @@
 package com.example.practice
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.example.practice.databinding.ActivityMainBinding
+import com.example.practice.data.entities.Album
 import com.example.practice.databinding.FragmentHomeBinding
+import com.example.practice.ui.main.MainActivity
 import com.google.gson.Gson
 
 class HomeFragment : Fragment() {

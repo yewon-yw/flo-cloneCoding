@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.practice.data.entities.Song
 import com.example.practice.databinding.ActivitySongBinding
 import com.google.gson.Gson
 
@@ -151,7 +152,7 @@ class SongActivity : AppCompatActivity() {
     }
 
     // UI변경
-    private fun setPlayer(song:Song) {
+    private fun setPlayer(song: Song) {
         // 인텐트로 화면전환만 할 뿐 데이터를 전송하지 않으니 인텐트 대신 song으로 바꿔줌
 //        binding.songMusicTitleTv.text = intent.getStringExtra("title")!!
         binding.songMusicTitleTv.text = song.title

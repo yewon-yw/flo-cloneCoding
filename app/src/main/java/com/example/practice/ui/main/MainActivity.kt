@@ -1,4 +1,4 @@
-package com.example.practice
+package com.example.practice.ui.main
 
 import android.content.Intent
 import android.media.MediaPlayer
@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.example.practice.*
+import com.example.practice.data.entities.Album
+import com.example.practice.data.entities.Song
 import com.example.practice.databinding.ActivityMainBinding
-import com.google.gson.Gson
 
 class MainActivity : AppCompatActivity() {
 
@@ -62,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             editor.putInt("songId",songs[nowPos].id)
             editor.apply()
 
-            var intent = Intent(this,SongActivity::class.java)
+            var intent = Intent(this, SongActivity::class.java)
             startActivity(intent)
         }
         // 챌린지 과제
@@ -114,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         return
     }
 
-    private fun setMiniPlayer(song:Song){
+    private fun setMiniPlayer(song: Song){
         binding.mainMiniplayerTitleTv.text=song.title
         binding.mainMiniplayerSingerTv.text=song.singer
         binding.mainMiniplayerProgressSb.progress=(song.second * 100000)/song.playTime
@@ -186,7 +188,7 @@ class MainActivity : AppCompatActivity() {
         setMiniPlayerStatus(false) // 음악 재생 종료
         Log.d("onPause","miniPlayer 실행 도중 앱이 포커스를 잃음") // Log 출력
     }
-    fun playOnMiniPlayer(album:Album){
+    fun playOnMiniPlayer(album: Album){
         binding.mainMiniplayerTitleTv.text=album.title.toString()
         binding.mainMiniplayerSingerTv.text=album.singer.toString()
     }

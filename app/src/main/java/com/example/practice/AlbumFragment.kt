@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.practice.data.entities.Album
+import com.example.practice.data.entities.Like
 import com.example.practice.databinding.FragmentAlbumBinding
+import com.example.practice.ui.main.MainActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 
@@ -32,7 +34,7 @@ class AlbumFragment: Fragment() {
         }
 
         val albumJson = arguments?.getString("album") // arguments에서 데이터를 꺼냄
-        val album=gson.fromJson(albumJson,Album::class.java) // Gson을 사용해서 Json을 Album객체로 바꿔줌
+        val album=gson.fromJson(albumJson, Album::class.java) // Gson을 사용해서 Json을 Album객체로 바꿔줌
         isLiked=isLikedAlbum(album.id)
         setInit(album) // 받아온 데이터로 위젯 변경하는 함수
         setOnClickListeners(album)
@@ -49,7 +51,7 @@ class AlbumFragment: Fragment() {
         return binding.root
     }
 
-    private fun setInit(album:Album){
+    private fun setInit(album: Album){
         binding.albumAlbumIv.setImageResource(album.coverImg!!)
         binding.albumMusicTitleTv.text=album.title.toString()
         binding.albumSingerNameTv.text=album.singer.toString()
@@ -85,7 +87,7 @@ class AlbumFragment: Fragment() {
 
         songDB.albumDao().disLikedAlbum(userId,albumId) // 유저가 좋아요를 해제하면 DB에서 데이터 삭제
     }
-    private fun setOnClickListeners(album:Album){
+    private fun setOnClickListeners(album: Album){
         val userId = getJwt()
         binding.albumLikeIv.setOnClickListener {
             if(isLiked){

@@ -1,5 +1,6 @@
-package com.example.practice
+package com.example.practice.data.remote
 
+import com.example.practice.data.entities.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

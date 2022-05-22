@@ -3,11 +3,13 @@ package com.example.practice
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.example.practice.data.entities.Album
+import com.example.practice.data.entities.Like
 
 @Dao
 interface AlbumDao {
     @Insert
-    fun insert(album:Album)
+    fun insert(album: Album)
 
     @Query("SELECT * FROM AlbumTable")
     fun getAlbums(): List<Album>

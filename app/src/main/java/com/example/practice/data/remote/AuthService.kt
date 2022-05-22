@@ -1,6 +1,10 @@
-package com.example.practice
+package com.example.practice.data.remote
 
 import android.util.Log
+import com.example.practice.LoginView
+import com.example.practice.SignUpView
+import com.example.practice.data.entities.User
+import com.example.practice.getRetrofit
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

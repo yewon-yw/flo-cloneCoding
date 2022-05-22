@@ -1,7 +1,6 @@
 package com.example.practice
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.practice.databinding.FragmentLockerBinding
+import com.example.practice.ui.main.MainActivity
 import com.google.android.material.tabs.TabLayoutMediator
 
 class LockerFragment : Fragment() {
@@ -65,7 +65,7 @@ class LockerFragment : Fragment() {
            binding.lockerLoginTv.setOnClickListener {
                // 로그아웃 진행
                logout()
-               startActivity(Intent(activity,MainActivity::class.java))
+               startActivity(Intent(activity, MainActivity::class.java))
            }
         }
     }

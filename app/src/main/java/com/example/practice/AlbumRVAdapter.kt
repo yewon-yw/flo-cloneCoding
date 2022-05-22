@@ -3,6 +3,7 @@ package com.example.practice
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.practice.data.entities.Album
 import com.example.practice.databinding.ItemAlbumBinding
 
 class AlbumRVAdapter(private var albumList:ArrayList<Album>): RecyclerView.Adapter<AlbumRVAdapter.ViewHolder>() {
@@ -10,7 +11,7 @@ class AlbumRVAdapter(private var albumList:ArrayList<Album>): RecyclerView.Adapt
     // 외부에서 클릭 이벤트를 사용하기 위해서 외부에서 리스너 객체를 넘겨줘야함
     // 외부에서 리스너 객체를 전달받는 함수와 전달받은 리스너 객체를 어댑터에서 사용할 수 있도록 따로 저장할 변수가 필요
     interface MyItemClickListener{ // 인터페이스
-        fun onItemClick(album:Album){ }// 앨범 데이터를 받아오기 위해 인자값으로 받음
+        fun onItemClick(album: Album){ }// 앨범 데이터를 받아오기 위해 인자값으로 받음
         //        fun onRemoveAlbum(position: Int)
         fun playOnMiniPlayer(album: Album) { } // 챌린지 과제
     }
@@ -19,7 +20,7 @@ class AlbumRVAdapter(private var albumList:ArrayList<Album>): RecyclerView.Adapt
         mItemClickListener = itemClickListener
     }
 
-    fun addItem(album:Album){
+    fun addItem(album: Album){
         albumList.add(album)
         notifyDataSetChanged() // RecyclerView는 데이터가 변경된 것을 모르기 때문에 데이터 변경됐음을 알려줘야함
     }
@@ -64,7 +65,7 @@ class AlbumRVAdapter(private var albumList:ArrayList<Album>): RecyclerView.Adapt
     // 매개변수로 아이템 뷰 객체를 받음
     // ViewHolder 클래스 상속받음
     inner class ViewHolder(val binding:ItemAlbumBinding):RecyclerView.ViewHolder(binding.root){
-        fun bind(album:Album){
+        fun bind(album: Album){
             binding.itemAlbumTitleTv.text=album.title
             binding.itemAlbumSingerTv.text=album.singer
             binding.itemAlbumCoverImgIv.setImageResource(album.coverImg!!)

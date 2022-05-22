@@ -1,6 +1,7 @@
 package com.example.practice
 
 import androidx.room.*
+import com.example.practice.data.entities.Song
 
 @Dao
 interface SongDao {
